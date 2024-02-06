@@ -8,6 +8,7 @@ use App\Models\Employee;
 use App\Models\Timezone;
 use App\Models\TimezoneDefaultJson;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -106,19 +107,11 @@ class SDKController extends Controller
     public function PersonAddRangePhotos(Request $request)
     {
 
-
-
         $url = env('SDK_URL') . "/Person/AddRange";
-        try {
-            $cameraResponse1 = $this->filterCameraModel1Devices($request);
-            $cameraResponse2 = $this->filterCameraModel2Devices($request);
-        } catch (\Exception $e) {
-        }
+       
         $deviceResponse = $this->processSDKRequestJob($url, $request->all());
 
-        Log::channel("camerasdk")->error(json_encode(["cameraResponse2" => $cameraResponse2, "cameraResponse1" => $cameraResponse1, "deviceResponse" => $deviceResponse]));
-
-        return ["cameraResponse" => $cameraResponse1, "cameraResponse2" => $cameraResponse2, "deviceResponse" => $deviceResponse];
+        return $deviceResponse;
     }
     // public function PersonAddRange(Request $request)
     // {
@@ -520,5 +513,10 @@ class SDKController extends Controller
                 "message" => $e->getMessage(),
             ];
         }
+    }
+
+    public function runSdk()
+    {
+      return  Artisan::call("sdk:run");
     }
 }

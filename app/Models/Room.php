@@ -21,6 +21,11 @@ class Room extends Model
         return $this->belongsTo(Floor::class);
     }
 
+    public function tanent()
+    {
+        return $this->hasOne(Tanent::class);
+    }
+
     public function room_category()
     {
         return $this->belongsTo(RoomCategory::class);

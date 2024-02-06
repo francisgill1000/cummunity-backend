@@ -6,6 +6,7 @@ use App\Http\Requests\Room\StoreRequest;
 use App\Http\Requests\Room\UpdateRequest;
 
 use App\Models\Room;
+use App\Models\Tanent;
 
 class RoomController extends Controller
 {
@@ -21,7 +22,12 @@ class RoomController extends Controller
 
     public function getRoomsByFloorId()
     {
-        return Room::where("company_id", request("company_id"))->where("floor_id", request("floor_id"))->get(["id","room_number"]);
+        return Room::where("company_id", request("company_id"))->where("floor_id", request("floor_id"))->get(["id", "room_number"]);
+    }
+
+    public function getTanentsAndMembersByRoomsId()
+    {
+        return Tanent::where("company_id", request("company_id"))->where("room_id", request("room_id"))->with("members")->get();
     }
 
     /**

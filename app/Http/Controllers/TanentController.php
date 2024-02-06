@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Tanent\StoreRequest;
 use App\Http\Requests\Tanent\UpdateRequest;
-
+use App\Models\Company;
 use App\Models\Tanent;
 
 class TanentController extends Controller
@@ -59,12 +59,21 @@ class TanentController extends Controller
 
             $data["full_name"] = "{$data["first_name"]} {$data["last_name"]}";
 
-            $communityId = $request->floor_id ?? 1001;
+            // $communityId = $request->floor_id ?? 1001;
+            // $shortYear = date("y");
+            // $floor_id = $request->floor_id;
+            // $room_id = $request->room_id;
+            // $tanentId = Tanent::max('id') + 1;
+
+            // $data["system_user_id"] = "{$communityId}{$shortYear}{$floor_id}{$room_id}{$tanentId}";
+
+            $communityId = $request->company_id;
             $shortYear = date("y");
-            $floor_id = $request->floor_id;
+            $floor_number = $request->floor_number;
+            $room_number = $request->room_number;
             $tanentId = Tanent::max('id') + 1;
 
-            $data["system_user_id"] = "{$communityId}{$shortYear}{$floor_id}{$tanentId}";
+            $data["system_user_id"] = "{$communityId}{$shortYear}{$floor_number}{$room_number}{$tanentId}";
 
             if (isset($request->profile_picture)) {
                 $file = $request->file('profile_picture');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Tanent;
 
+use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreRequest extends FormRequest
@@ -23,13 +24,25 @@ class StoreRequest extends FormRequest
      */
     public function rules()
     {
+        $room_id = $this->room_id;
+        $companyId = $this->company_id;
+
         return [
+
+            'room_id' => [
+                'required',
+                Rule::unique('tanents')->where(function ($query) use ($room_id, $companyId) {
+                    return $query->where('room_id', $room_id)
+                        ->where('company_id', $companyId);
+                }),
+            ],
+
+
             "full_name" => "nullable|min:3|max:20",
             "first_name" => "required|min:3|max:20",
             "last_name" => "required|min:3|max:20",
             "phone_number" => "required|min:10|max:20",
             "floor_id" => "required",
-            "room_id" => "required",
             "start_date" => "required",
             "end_date" => "required",
             "profile_picture" => "nullable",
@@ -48,7 +61,7 @@ class StoreRequest extends FormRequest
 
             "nationality" => "required",
             "address" => "required",
-            
+
             "passport_doc" => "nullable",
             "id_doc" => "nullable",
             "contract_doc" => "nullable",
