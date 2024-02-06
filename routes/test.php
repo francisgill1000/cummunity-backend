@@ -28,7 +28,9 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log as Logger;
 
 
-Route::get('/syncLogsScript', function (Request $request) {
+Route::get('/test-flight', function (Request $request) {
+
+    return "Api Landed";
 
     // return [
     //     (new FiloShiftController)->render(),
