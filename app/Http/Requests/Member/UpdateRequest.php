@@ -28,7 +28,6 @@ class UpdateRequest extends FormRequest
             'phone_number' => 'nullable',
             'age' => 'required|string|max:255',
             'relation' => 'required|string|max:255',
-            'tanent_id' => 'required|numeric',
             'profile_picture' => 'nullable',
         ];
     }

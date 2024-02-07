@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Access Control Report</title>
+    <title>Occupancy Report</title>
     <style>
         * {
             padding: 0px;
@@ -186,59 +186,77 @@
                 <tr>
                     <td class="text-left border-none col-4">
                         <div class="logo pt">
-                            <img style="width: 100%" src="https://amc.mytime2cloud.com/mail-logo.png"
-                                alt="Company Logo" />
+                            @if (env('APP_ENV') == 'local')
+                                <img style="width: 100%" src="https://amc.mytime2cloud.com/mail-logo.png"
+                                    alt="Company Logo" />
+                            @else
+                                <img style="width: 100%" src="{{ $company->logo }}" alt="Company Logo" />
+                            @endif
                         </div>
                     </td>
                     <td class="text-center border-none col-4 uppercase">
                         <div>
-                            <b>{{ $params['report_type'] ?? 'Access Control Report' }} </b>
-                            <div class="border-top border-bottom">
+                            <b>{{ $params['report_type'] ?? 'All' }} Rooms </b>
+                            {{-- <div class="border-top border-bottom">
                                 {{ date('d-M-Y', strtotime($params['from_date'])) }} TO
                                 {{ date('d-M-Y', strtotime($params['to_date'])) }}
 
-                            </div>
+                            </div> --}}
                         </div>
                     </td>
                     <td class="text-right border-none col-4">
                         <div class="company-info">
-                            <h3>AKIL SECURITY AND ALARM SYSTEMS</h3>
-                            <p>DUBAI - UNITED ARAB EMIRATES</p>
-                            <p>+971 4 3939 562, INFO@AKILGROUP.COM</p>
+                            <h3>{{ $company->name ?? '---' }}</h3>
+                            <p>{{ $company->location ?? '---' }}</p>
+                            <p>{{ $company->contact->number ?? '---' }}, {{ $company->user->email ?? '---' }}</p>
                         </div>
                     </td>
                 </tr>
             </table>
             <table class="mt-5">
                 <tr>
-                    <th>S.NO</th>
-                    <th>Name</th>
-                    <th>Phone</th>
-                    <th>Door</th>
-                    <th>DateTime</th>
-                    <th>In</th>
-                    <th>Out</th>
-                    <th>Mode</th>
+                    <th>#</th>
+                    <th>Room Number</th>
+                    <th>Floor</th>
+                    <th>Room Category</th>
+                    <th>Tanent</th>
+                    <th>Contract Start</th>
+                    <th>Contract End</th>
                     <th>Status</th>
-                    <th>User Type</th>
                 </tr>
                 @foreach ($chunk as $key => $data)
                     <tr>
                         <td style="width:10px;">{{ $key + 1 }}</td>
+                        <td>{{ $data['room_number'] }}</td>
+                        <td>{{ $data['floor_id'] }}</td>
+                        <td>{{ $data['room_category']['name'] }}</td>
+                        <td>{{ $data['tanent']['full_name'] }}</td>
+
+                        <td>{{ $data['tanent']['start_date'] }}</td>
+                        <td>{{ $data['tanent']['end_date'] }}</td>
+
+
 
                         <td>
-                            @php
-                                $pic = 'https://i.pinimg.com/originals/df/5f/5b/df5f5b1b174a2b4b6026cc6c8f9395c1.jpg';
+                            @if (isset($data['tanent']['id']))
+                                Occupied
+                            @else
+                                Available
+                            @endif
+                        </td>
 
-                                if ($data['tanent'] && $data['tanent']['profile_picture']) {
-                                    $pic = getcwd() . '/community/profile_picture/' . $data['tanent']['profile_picture_name'];
-                                } else {
-                                    $pic = getcwd() . '/community/profile_picture/' . $data['member']['profile_picture_name'];
-                                }
 
-                            @endphp
 
-                            <table>
+                        {{-- <td> --}}
+                        @php
+                            //$pic = 'https://i.pinimg.com/originals/df/5f/5b/df5f5b1b174a2b4b6026cc6c8f9395c1.jpg';
+
+                            // if ($data['tanent'] && $data['tanent']['profile_picture']) {
+                            //     $pic = getcwd() . '/community/profile_picture/' . $data['tanent']['profile_picture_name'];
+                            // }
+                        @endphp
+
+                        {{-- <table>
                                 <tr>
                                     <td style="width:20px;" class="border-none">
 
@@ -255,21 +273,9 @@
                                         </small>
                                     </td>
                                 </tr>
-                            </table>
-                        </td>
-                        <td>{{ $data['tanent']['phone_number'] ?? $data['member']['phone_number'] }}</td>
-                        <td>{{ $data['device']['location'] ?? '---' }}</td>
-                        <td>{{ $data['date'] }} {{ $data['time'] }}</td>
-                        <td>
-                            {{ strtolower($data['device']['function']) !== 'out' ? 'In' : '---' }}
-                        </td>
-                        <td>
-                            {{ strtolower($data['device']['function']) == 'out' ? 'Out' : '---' }}
-                        </td>
-                        </td>
-                        <td>{{ $data['device']['mode'] ?? '---' }}</td>
-                        <td>{{ $data['status'] }}</td>
-                        <td>{{ $data['tanent'] ? "Tanent" : "Member" }}</td>
+                            </table> --}}
+                        {{-- </td> --}}
+
                     </tr>
                 @endforeach
             </table>

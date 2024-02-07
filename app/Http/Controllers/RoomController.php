@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Room\StoreRequest;
 use App\Http\Requests\Room\UpdateRequest;
-
+use App\Models\Company;
 use App\Models\Room;
 use App\Models\Tanent;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
 
 class RoomController extends Controller
 {
@@ -17,7 +19,98 @@ class RoomController extends Controller
      */
     public function index()
     {
-        return Room::where("company_id", request("company_id"))->with(["floor", "room_category"])->paginate(request("per_page") ?? 10);
+        return Room::where("company_id", request("company_id"))->with(["tanent", "floor", "room_category"])->paginate(request("per_page") ?? 10);
+    }
+
+    public function report()
+    {
+        return Room::where("company_id", request("company_id"))
+            ->when(request()->filled("report_type"), function ($q) {
+                if (request("report_type") == "Occupied") {
+                    return $q->whereHas("tanent");
+                }
+                if (request("report_type") == "Available") {
+                    return $q->whereDoesntHave("tanent");
+                }
+
+                if (request("report_type") == "Expire") {
+                    return $q->whereHas("tanent", function ($query) {
+                        $query->whereDate('end_date', '>=', date("Y-m-d"));
+                        $query->whereDate('end_date', '<=', now()->addDays(30));
+                    });
+                }
+            })
+            ->with(["tanent", "floor", "room_category"])->paginate(request("per_page") ?? 10);
+    }
+
+
+
+    public function print(Request $request)
+    {
+        $model = Room::where("company_id", request("company_id"))
+            ->when(request()->filled("report_type"), function ($q) {
+                if (request("report_type") == "Occupied") {
+                    return $q->whereHas("tanent");
+                }
+                if (request("report_type") == "Available") {
+                    return $q->whereDoesntHave("tanent");
+                }
+
+                if (request("report_type") == "Expire") {
+                    return $q->whereHas("tanent", function ($query) {
+                        $query->whereDate('end_date', '>=', date("Y-m-d"));
+                        $query->whereDate('end_date', '<=', now()->addDays(30));
+                    });
+                }
+            })
+            ->with(["tanent", "floor", "room_category"]);
+
+        $data = $model->get()->toArray();
+
+        if ($request->debug) return $data;
+
+        $chunks = array_chunk($data, 10);
+
+        return Pdf::setPaper('a4', 'landscape')->loadView('pdf.room_report.report', [
+            "chunks" => $chunks,
+            "company" => Company::whereId(request("company_id") ?? 0)->first(),
+            "params" => $request->all(),
+
+        ])->stream();
+    }
+
+    public function download(Request $request)
+    {
+        $model = Room::where("company_id", request("company_id"))
+            ->when(request()->filled("report_type"), function ($q) {
+                if (request("report_type") == "Occupied") {
+                    return $q->whereHas("tanent");
+                }
+                if (request("report_type") == "Available") {
+                    return $q->whereDoesntHave("tanent");
+                }
+
+                if (request("report_type") == "Expire") {
+                    return $q->whereHas("tanent", function ($query) {
+                        $query->whereDate('end_date', '>=', date("Y-m-d"));
+                        $query->whereDate('end_date', '<=', now()->addDays(30));
+                    });
+                }
+            })
+            ->with(["tanent", "floor", "room_category"]);
+
+        $data = $model->get()->toArray();
+
+        if ($request->debug) return $data;
+
+        $chunks = array_chunk($data, 10);
+
+        return Pdf::setPaper('a4', 'landscape')->loadView('pdf.room_report.report', [
+            "chunks" => $chunks,
+            "company" => Company::whereId(request("company_id") ?? 0)->first(),
+            "params" => $request->all(),
+
+        ])->download();
     }
 
     public function getRoomsByFloorId()

@@ -23,7 +23,12 @@ class Room extends Model
 
     public function tanent()
     {
-        return $this->hasOne(Tanent::class);
+        return $this->hasOne(Tanent::class)->withDefault([
+            "full_name" => "---",
+            "start_date" => "---",
+            "end_date" => "---",
+            "end_date" => "---",
+        ]);
     }
 
     public function room_category()

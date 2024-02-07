@@ -195,19 +195,17 @@ class AttendanceLogController extends Controller
         foreach ($result["data"] as $row) {
             $columns = explode(',', $row);
 
-            $isDuplicateLogTime = $this->verifyDuplicateLog($columns);
+            // $isDuplicateLogTime = $this->verifyDuplicateLog($columns);
 
-            if (!$isDuplicateLogTime) {
-                $records[] = [
-                    "UserID" => $columns[0],
-                    "DeviceID" => $columns[1],
-                    "LogTime" => substr(str_replace("T", " ", $columns[2]), 0, 16),
-                    "SerialNumber" => $columns[3],
-                    "status" => $columns[4] ?? "Allowed",
-                    "mode" => $columns[5] ?? "Face",
-                    "reason" => $columns[6] ?? "---",
-                ];
-            }
+            $records[] = [
+                "UserID" => $columns[0],
+                "DeviceID" => $columns[1],
+                "LogTime" => substr(str_replace("T", " ", $columns[2]), 0, 16),
+                "SerialNumber" => $columns[3],
+                "status" => $columns[4] ?? "Allowed",
+                "mode" => $columns[5] ?? "Face",
+                "reason" => $columns[6] ?? "---",
+            ];
         }
 
         try {

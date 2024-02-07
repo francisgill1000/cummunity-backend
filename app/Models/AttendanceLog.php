@@ -53,6 +53,16 @@ class AttendanceLog extends Model
     {
         return $this->belongsTo(Employee::class, "UserID", "system_user_id");
     }
+
+    public function tanent()
+    {
+        return $this->belongsTo(Tanent::class, "UserID", "system_user_id");
+    }
+
+    public function member()
+    {
+        return $this->belongsTo(Member::class, "UserID", "system_user_id");
+    }
     public function branch()
     {
         return $this->belongsTo(CompanyBranch::class, "branch_id");

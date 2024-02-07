@@ -11,6 +11,10 @@ class Tanent extends Model
 
     protected $guarded = [];
 
+    protected $appends = [
+        "profile_picture_name",
+    ];
+
     protected $casts = [
         "floor_id" => "integer",
         "room_id" => "integer",
@@ -41,11 +45,17 @@ class Tanent extends Model
         return $this->belongsTo(Room::class)->with("room_category:id,name");
     }
 
+    public function getProfilePictureNameAttribute()
+    {
+       return explode("community/profile_picture/" , $this->profile_picture)[1] ?? "";
+    }
+
     public function getProfilePictureAttribute($value)
     {
         if (!$value) return null;
         return asset('community/profile_picture/' . $value);
     }
+    
 
     public static function ProcessDocument($file, $path)
     {
